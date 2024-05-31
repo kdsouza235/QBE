@@ -8,6 +8,8 @@ These instructions were prepared on the following environment:
 - Debian based Linux OS 8.3.0-6 and higher (64 bit)
 - Python 3.10
 
+- Note: This can be run with a different OS or version of Python. Some instructions may vary.
+
 ## Initial Setup:
 
 ### Python Virtual Environment
