@@ -9,6 +9,9 @@ app = FastAPI()
 # Define models for request payloads
 class ValidateRequest(BaseModel):
     data: List[dict]
+    
+class GetFactorsRequest(BaseModel):
+    data: List[dict]
 
 # Load data from CSV
 def read_csv(file_path):
@@ -56,3 +59,37 @@ async def validate(payload: ValidateRequest):
     
     print("Validation completed successfully.")  # Server Log statement
     return {"message": "Data is valid."}
+
+@app.post("/get_factors")
+async def get_factors(payload: GetFactorsRequest):
+    """
+    Maps the factors and returns the results in JSON format.
+    """
+    print("Received request:", payload)  # Server Log statement
+    csv_data = read_csv("data.csv")
+    print("CSV Data:", csv_data)  # Server Log statement
+
+    # Create a dictionary to store the factors
+    factors = {}
+
+    # Iterate over the items in the payload
+    for item in payload.data:
+        var_name = item.get("var_name")
+        category = item.get("category")
+
+        print(f"Checking factor for variable name '{var_name}' and category '{category}'")  # Server Log statement
+
+        # Find the factor corresponding to the given variable name and category
+        for entry in csv_data:
+            if entry["var_name"] == var_name and entry["category"] == category:
+                factors.setdefault("results", []).append({
+                    "var_name": var_name,
+                    "category": category,
+                    "factor": entry["factor"]
+                })
+                break
+        else:
+            raise HTTPException(status_code=400, detail=f"No factor found for variable name '{var_name}' and category '{category}'")
+
+    print("Factors:", factors)  # Server Log statement
+    return factors
